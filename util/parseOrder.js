@@ -16,5 +16,3 @@ export default function parseOrder(string) {
         date: parsedTimeStamp
     }
 }
-
-console.log(parseOrder("electronic custom distributors #sm bds /tomorrow 9pm"))

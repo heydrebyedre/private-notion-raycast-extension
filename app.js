@@ -12,11 +12,12 @@ const notion = new Client({
     auth: process.env.NOTION_TOKEN
 });
 
-let value = "Plan B Skateboards #sm bds /tomorrow 9:35pm"
-const order = parseOrder(value)
+let value = "volcom jeans co #sm fs /today 8pm"
+// const order = parseOrder(value)
 
 
-async function addOrder(order) {
+async function addOrder(val) {
+    const order = parseOrder(val)
     const { customerName: name, tags, date } = order
     let icon = determineIcon(tags)
     let parsedTags = parseTags(tags)
@@ -63,5 +64,5 @@ async function addOrder(order) {
     console.log(response.created_time)
 }
 
-const created = addOrder(order)
-addOrder(parseOrder('independent trucks #sm fs /today 8pm'))
+const created = addOrder(value)
+addOrder('almost skateboards #fs bds /next tuesday 8am')

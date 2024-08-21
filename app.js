@@ -12,7 +12,7 @@ const notion = new Client({
     auth: process.env.NOTION_TOKEN
 });
 
-let value = "volcom jeans co #sm fs /today 8pm"
+// let value = "volcom jeans co #sm fs /today 8pm"
 // const order = parseOrder(value)
 
 
@@ -38,31 +38,22 @@ async function addOrder(val) {
                 title: [
                     {
                         type: 'text',
-                        text: {
-                            content: name
-                        }
+                        text: {content: name}
                     }
                 ],
             },
             "Planned Date": {
                 type: 'date',
-                date: {
-                    start: date
-                },
+                date: {start: date},
             },
             Status: {
                 type: 'status',
-                status: {
-                    name: "Processing"
-                }
+                status: {name: "Processing"}
             },
-            Tags: {
-                "multi_select": parsedTags
-            }
+            Tags: {"multi_select": parsedTags}
         },
     })
     console.log(response.created_time)
 }
 
-const created = addOrder(value)
-addOrder('almost skateboards #fs bds /next tuesday 8am')
+addOrder(process.argv[2])

@@ -1,5 +1,9 @@
 let entry = "electronic custom distributors #ltl bds /tomorrow 6pm"
-import Sugar from "./node_modules/sugar-date/index.js"
+import Sugar from "./node_modules/sugar-date/index.js";
+import { configDotenv } from "dotenv";
+import { Client } from "@notionhq/client";
+
+configDotenv()
 
 function splitUpString(string){
     const tagIndex = string.indexOf("#")
@@ -19,8 +23,4 @@ function capitalCase(string) {
     return newString.join(" ")
 }
 
-const [customer, tags, date] = splitUpString(entry)
-
-console.log(Sugar.Date.create('tomorrow 1pm'))
-
-console.log(customer, tags, Sugar.Date.create(date))
+console.log(process.env.NOTION_TOKEN)

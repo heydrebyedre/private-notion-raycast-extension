@@ -1,4 +1,4 @@
-let entry = "lightning av part two #sm bds /tomorrow 9:31am"
+let entry = "girl skateboards company #ltl bds eqo /today 6pm"
 import Sugar from "./node_modules/sugar-date/index.js";
 import { configDotenv } from "dotenv";
 import { Client } from "@notionhq/client";
@@ -28,9 +28,21 @@ function determineIcon(str) {
     if (str.includes("ltl")) return "🚚"
 }
 
-const { tags } = splitUpString(entry)
-console.log(tags, typeof tags)
-console.log(determineIcon(tags))
+function parseTags(str) {
+    const tagArray = []
+    if (str.includes("bds")) tagArray.push({ name: "Blind Drop Ship" })
+    if (str.includes("fs")) tagArray.push({ name: "Free Shipping" })
+    if (str.includes("ltl")) tagArray.push({ name: "Less Than Truckload" })
+    if (str.includes("sm")) tagArray.push({ name: "Small Parcel" })
+    if (str.includes("eqo")) tagArray.push({ name: "Webshop Order" })
+    return tagArray
+}
+
+// const { tags } = splitUpString(entry)
+// console.log(tags, typeof tags)
+// console.log(determineIcon(tags))
+
+console.log(parseTags('ltl fs eqo'))
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN
@@ -58,6 +70,7 @@ testingSomething(order)
 async function addOrder(str) {
     const { customerName: name, tags, date } = str
     let icon = determineIcon(tags)
+    let dataTags = parseTags(tags)
     let convertedDate = Sugar.Date.create(date)
     // console.log(name, tags, date, icon, convertedDate)
     const response = await notion.pages.create({
@@ -87,6 +100,23 @@ async function addOrder(str) {
                     start: convertedDate
                 },
             },
+            Status: {
+                type: 'status',
+                status: {
+                    name: "Processing"
+                }
+            },
+            Tags: {
+                name: "Tags",
+                type: "multi_select",
+                "multi_select": {
+                    options: [
+                        {
+                            name: "Free Shipping"
+                        }
+                    ]
+                },
+            }
         },
     })
     console.log(response.created_time)

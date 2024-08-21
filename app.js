@@ -1,4 +1,4 @@
-let entry = "girl skateboards company #ltl bds eqo /today 6pm"
+let entry = "thank you skateboards #sm bds eqo fs /today 6pm"
 import Sugar from "./node_modules/sugar-date/index.js";
 import { configDotenv } from "dotenv";
 import { Client } from "@notionhq/client";
@@ -35,6 +35,7 @@ function parseTags(str) {
     if (str.includes("ltl")) tagArray.push({ name: "Less Than Truckload" })
     if (str.includes("sm")) tagArray.push({ name: "Small Parcel" })
     if (str.includes("eqo")) tagArray.push({ name: "Webshop Order" })
+    if (str.includes("amz")) tagArray.push({ name: "Amazon" })
     return tagArray
 }
 
@@ -107,15 +108,14 @@ async function addOrder(str) {
                 }
             },
             Tags: {
-                name: "Tags",
-                type: "multi_select",
-                "multi_select": {
-                    options: [
-                        {
-                            name: "Free Shipping"
-                        }
-                    ]
-                },
+                // name: "Tags",
+                // type: "multi_select",
+                // "multi_select": [
+                //     {
+                //         "name": "Free Shipping"
+                //     }
+                // ]
+                "multi_select": dataTags
             }
         },
     })

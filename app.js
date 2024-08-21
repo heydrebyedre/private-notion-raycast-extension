@@ -1,78 +1,26 @@
-let entry = "thank you skateboards #sm bds eqo fs /today 6pm"
-import Sugar from "./node_modules/sugar-date/index.js";
 import { configDotenv } from "dotenv";
 import { Client } from "@notionhq/client";
 
+import parseOrder from "./util/parseOrder.js";
+import determineIcon from "./util/determineIcon.js";
+import parseTags from "./util/parseTags.js";
+
 configDotenv()
 
-function splitUpString(string){
-    const tagIndex = string.indexOf("#")
-    const dateIndex = string.indexOf("/")
-    const customerName = capitalCase(string.split("#")[0])
-    let tags = string.slice(tagIndex).split("/")[0]
-    let date = string.slice(dateIndex)
-    return {customerName: customerName, tags: tags.substring(1, tags.length), date: date.substring(1, date.length)}
-}
-
-function capitalCase(string) {
-    const words = string.split(" ")
-    let newString = []
-    for (let word of words) {
-        newString.push(word.charAt(0).toUpperCase() + word.slice(1))
-    }
-    return newString.join(" ")
-}
-
-function determineIcon(str) {
-    if (str.includes("sm")) return "📦"
-    if (str.includes("ltl")) return "🚚"
-}
-
-function parseTags(str) {
-    const tagArray = []
-    if (str.includes("bds")) tagArray.push({ name: "Blind Drop Ship" })
-    if (str.includes("fs")) tagArray.push({ name: "Free Shipping" })
-    if (str.includes("ltl")) tagArray.push({ name: "Less Than Truckload" })
-    if (str.includes("sm")) tagArray.push({ name: "Small Parcel" })
-    if (str.includes("eqo")) tagArray.push({ name: "Webshop Order" })
-    if (str.includes("amz")) tagArray.push({ name: "Amazon" })
-    return tagArray
-}
-
-// const { tags } = splitUpString(entry)
-// console.log(tags, typeof tags)
-// console.log(determineIcon(tags))
-
-console.log(parseTags('ltl fs eqo'))
 
 const notion = new Client({
     auth: process.env.NOTION_TOKEN
 });
 
-async function getAllOrders() {
-    const response = await notion.databases.query({
-        database_id: process.env.DATABASE_ID
-    })
-    console.log(response.results)
-}
+let value = "Plan B Skateboards #sm bds /tomorrow 9:35pm"
+const order = parseOrder(value)
 
-const order = splitUpString(entry)
 
-function testingSomething(str) {
-    const { customerName: name, tags, date } = str
-    // let icon = determineIcon(tags)
-    let convertedDate = Sugar.Date.create(date)
-    console.log(name, tags, date, convertedDate)
-    return name
-}
-
-testingSomething(order)
-
-async function addOrder(str) {
-    const { customerName: name, tags, date } = str
+async function addOrder(order) {
+    const { customerName: name, tags, date } = order
     let icon = determineIcon(tags)
-    let dataTags = parseTags(tags)
-    let convertedDate = Sugar.Date.create(date)
+    let parsedTags = parseTags(tags)
+    // let convertedDate = Sugar.Date.create(date)
     // console.log(name, tags, date, icon, convertedDate)
     const response = await notion.pages.create({
         parent: {
@@ -98,7 +46,7 @@ async function addOrder(str) {
             "Planned Date": {
                 type: 'date',
                 date: {
-                    start: convertedDate
+                    start: date
                 },
             },
             Status: {
@@ -108,22 +56,12 @@ async function addOrder(str) {
                 }
             },
             Tags: {
-                // name: "Tags",
-                // type: "multi_select",
-                // "multi_select": [
-                //     {
-                //         "name": "Free Shipping"
-                //     }
-                // ]
-                "multi_select": dataTags
+                "multi_select": parsedTags
             }
         },
     })
     console.log(response.created_time)
 }
 
-// const results = getAllOrders()
-// // console.log(results)
-// console.log(results.properties)
-
 const created = addOrder(order)
+addOrder(parseOrder('independent trucks #sm fs /today 8pm'))
